@@ -9,6 +9,7 @@
  * \addtogroup main
  */
 #include <main.h>
+#include <scratch/log.h>
 #include <scratch/scratch.h>
 
 /*!
@@ -19,5 +20,6 @@
  * \return zero for normal program termination, non-zero otherwise
  */
 int main(int argc, const char *argv[]) {
+  Log("Package " PACKAGE_STRING "");
   return (EXIT_SUCCESS);
 }
