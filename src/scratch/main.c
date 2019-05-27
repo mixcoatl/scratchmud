@@ -9,6 +9,7 @@
  * \addtogroup main
  */
 #include <main.h>
+#include <scratch/game.h>
 #include <scratch/log.h>
 #include <scratch/random.h>
 #include <scratch/scratch.h>
@@ -22,7 +23,16 @@
  */
 int main(int argc, const char *argv[]) {
   Log("Package " PACKAGE_STRING "");
+
+  /* RNG state */
   Log("Seeding shared RNG state");
   RandomReseedTime(&_G_random, NULL);
+
+  /* Run the game */
+  Game *game = GameAlloc();
+  if (GameParseArguments(game, argv, argc))
+    GameRun(game);
+  GameFree(game);
+
   return (EXIT_SUCCESS);
 }
