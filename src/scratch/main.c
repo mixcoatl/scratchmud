@@ -10,6 +10,7 @@
  */
 #include <main.h>
 #include <scratch/log.h>
+#include <scratch/random.h>
 #include <scratch/scratch.h>
 
 /*!
@@ -21,5 +22,7 @@
  */
 int main(int argc, const char *argv[]) {
   Log("Package " PACKAGE_STRING "");
+  Log("Seeding shared RNG state");
+  RandomReseedTime(&_G_random, NULL);
   return (EXIT_SUCCESS);
 }
