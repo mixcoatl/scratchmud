@@ -5,4 +5,5 @@ __top_builddir__bin_scratchd_SOURCES=\
 	main.c \
 	random.c \
 	string.c \
-	time.c
+	time.c \
+	utility.c
