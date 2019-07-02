@@ -4,6 +4,7 @@ __top_builddir__bin_scratchd_SOURCES=\
 	client.c \
 	color.c \
 	constant.c \
+	data.c \
 	editor.c \
 	game.c \
 	list.c \
