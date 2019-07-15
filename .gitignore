@@ -85,3 +85,6 @@ src/include/stamp-h1
 src/include/conf.h
 src/include/conf.h.in
 src/scratch/.deps/
+
+# Other ScratchMUD files
+.autorun.kill
