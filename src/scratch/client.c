@@ -13,6 +13,7 @@
 #include <scratch/bitvector.h>
 #include <scratch/client.h>
 #include <scratch/color.h>
+#include <scratch/editor.h>
 #include <scratch/game.h>
 #include <scratch/log.h>
 #include <scratch/memory.h>
@@ -88,6 +89,10 @@ void ClientClose(Client *client) {
   if (!client) {
     Log("invalid `client` Client");
   } else {
+    /* Editor cleanup */
+    if (client->editor)
+      EditorAbort(client);
+
     /* Socket cleanup */
     SocketFree(client->socket);
     client->socket = NULL;
@@ -287,7 +292,11 @@ void ClientReceive(Client *client) {
 	    client->input[--client->inputN] = '\0';
 	} else if (*p == '\n') {
 	  BitSetN(client->flags, CLIENT_PROMPT);
-	  ClientPrint(client, "%s\r\n", client->input);
+	  if (client->editor) {
+	    EditorAdd(client, client->input);
+	  } else {
+	    ClientPrint(client, "%s\r\n", client->input);
+	  }
 	  MemoryZero(client->input, char, client->inputN);
 	  client->inputN = 0;
 	} else if (client->inputN >= sizeof(client->input) - 1) {

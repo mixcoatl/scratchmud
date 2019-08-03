@@ -16,6 +16,7 @@
 
 /* Forward type declarations */
 typedef struct _Client Client;
+typedef struct _Editor Editor;
 typedef struct _Server Server;
 typedef struct _Socket Socket;
 
@@ -41,6 +42,7 @@ typedef struct _Socket Socket;
  * \{
  */
 struct _Client {
+  Editor       *editor;         /*!< The string editor session */
   Bitvector     flags;          /*!< The client flags: CLIENT_x */
   char         *hostname;       /*!< The remote name */
   uint8_t       input[MAXLEN_INPUT];  /*!< The input buffer */
