@@ -15,11 +15,12 @@
 #include <scratch/scratch.h>
 
 /* Forward type declarations */
-typedef struct _Client Client;
-typedef struct _Editor Editor;
-typedef struct _Server Server;
-typedef struct _Socket Socket;
-typedef struct _State  State;
+typedef struct _Client  Client;
+typedef struct _Editor  Editor;
+typedef struct _OlcData OlcData;
+typedef struct _Server  Server;
+typedef struct _Socket  Socket;
+typedef struct _State   State;
 
 /*!
  * Client flags.
@@ -69,6 +70,7 @@ struct _Client {
   char         *name;           /*!< The client name */
   uint16_t      nawsHeight;     /*!< The client window height */
   uint16_t      nawsWidth;      /*!< The client window width */
+  OlcData      *olc;            /*!< The OLC state */
   uint8_t       output[MAXLEN_IOBUF]; /*!< The output buffer */
   size_t        outputN;        /*!< The output buffer used */
   uint8_t       subneg[MAXLEN_IOBUF]; /*!< The sub-negotiation buffer */

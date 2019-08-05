@@ -20,6 +20,7 @@
 #include <scratch/game.h>
 #include <scratch/log.h>
 #include <scratch/memory.h>
+#include <scratch/olc.h>
 #include <scratch/rbtree.h>
 #include <scratch/server.h>
 #include <scratch/scratch.h>
@@ -41,6 +42,7 @@ Client *ClientAlloc(Server *server) {
     Log("invalid `server` Server");
   } else {
     MemoryCreate(client, Client, 1);
+    client->olc        = NULL;
     client->nawsHeight = /* default */ 25;
     client->nawsWidth  = /* default */ 80;
     client->server     = server;
@@ -100,6 +102,10 @@ void ClientClose(Client *client) {
     /* Editor cleanup */
     if (client->editor)
       EditorAbort(client);
+
+    /* OLC cleanup */
+    if (client->olc)
+      OlcCleanup(client);
 
     /* Detach from client state */
     ClientStateChange(client, NULL);
@@ -169,6 +175,7 @@ void ClientFlush(Client *client) {
 void ClientFree(Client *client) {
   if (client) {
     ClientClose(client);
+    OlcFree(client->olc);
     StringFree(client->hostname);
     StringFree(client->name);
     MemoryFree(client);
