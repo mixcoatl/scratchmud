@@ -1,0 +1,39 @@
+Genders:
+  Common:
+    Copula: are~
+    Determiner: their~
+    Pronouns:
+      Object: them~
+      Possessive: theirs~
+      Subject: they~
+      ~
+    ~
+  Female:
+    Copula: is~
+    Determiner: her~
+    Pronouns:
+      Object: her~
+      Possessive: hers~
+      Subject: she~
+      ~
+    ~
+  Male:
+    Copula: is~
+    Determiner: his~
+    Pronouns:
+      Object: him~
+      Possessive: his~
+      Subject: he~
+      ~
+    ~
+  Neuter:
+    Copula: is~
+    Determiner: its~
+    Pronouns:
+      Object: it~
+      Possessive: its~
+      Subject: it~
+      ~
+    ~
+  ~
+~

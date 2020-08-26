@@ -7,6 +7,7 @@ __top_builddir__bin_scratchd_SOURCES=\
 	data.c \
 	editor.c \
 	game.c \
+	gender.c \
 	list.c \
 	log.c \
 	main.c \

@@ -11,6 +11,7 @@
 #define _SCRATCH_GAME_C_
 
 #include <scratch/game.h>
+#include <scratch/gender.h>
 #include <scratch/log.h>
 #include <scratch/memory.h>
 #include <scratch/rbtree.h>
@@ -29,6 +30,9 @@
 Game *GameAlloc(void) {
   Game *game;
   MemoryCreate(game, Game, 1);
+  game->genders = RBTreeAlloc(
+	(RBTreeCompareProc) UtilityNameCmp,
+	(RBTreeFreeProc)    GenderFree);
   game->server = ServerAlloc(game);
   game->shutdown = false;
   game->states = RBTreeAlloc(
@@ -46,6 +50,7 @@ Game *GameAlloc(void) {
  */
 void GameFree(Game *game) {
   if (game) {
+    RBTreeFree(game->genders);
     ServerFree(game->server);
     RBTreeFree(game->states);
     MemoryFree(game);
@@ -86,6 +91,9 @@ void GameRun(Game *game) {
   } else {
     /* Load client states */
     StateLoadIndex(game);
+
+    /* Load genders */
+    GenderLoadIndex(game);
 
     /* Open the server port */
     if (!ServerOpen(game->server, "", 6767))
