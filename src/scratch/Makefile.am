@@ -1,6 +1,7 @@
 bin_PROGRAMS=$(top_builddir)/bin/scratchd
 __top_builddir__bin_scratchd_LDFLAGS=-rdynamic
 __top_builddir__bin_scratchd_SOURCES=\
+	action.c \
 	block.c \
 	client.c \
 	color.c \

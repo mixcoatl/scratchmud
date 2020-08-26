@@ -14,6 +14,45 @@
 #include <scratch/scratch.h>
 
 /*!
+ * Action target bit strings.
+ * \addtogroup action
+ * \addtogroup constant
+ */
+const char *_G_actBitStrings[] = {
+  /* 00 */ "Actor",
+  /* 01 */ "Hide",
+  /* 02 */ "Nearby",
+  /* 03 */ "Target",
+	   "\n"
+};
+
+/*!
+ * Action macro strings.
+ * \addtogroup action
+ * \addtogroup constant
+ */
+const char *_G_actMacroStrings[] = {
+  /* 00 */ "Copula",
+  /* 01 */ "Determiner",
+  /* 02 */ "Name",
+  /* 03 */ "NamePossessive",
+  /* 04 */ "Object",
+  /* 05 */ "Possessive",
+  /* 06 */ "RawCopula",
+  /* 07 */ "RawDeterminer",
+  /* 08 */ "RawName",
+  /* 09 */ "RawNamePossessive",
+  /* 10 */ "RawObject",
+  /* 11 */ "RawPossessive",
+  /* 12 */ "RawReflexive",
+  /* 13 */ "RawSubject",
+  /* 14 */ "Reflexive",
+  /* 15 */ "Subject",
+  /* 16 */ "Text",
+	   "\n"
+};
+
+/*!
  * Client bit strings.
  * \addtogroup client
  * \addtogroup constant

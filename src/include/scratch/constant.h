@@ -14,6 +14,20 @@
 #include <scratch/scratch.h>
 
 /*!
+ * Action target bit strings.
+ * \addtogroup action
+ * \addtogroup constant
+ */
+extern const char *_G_actBitStrings[];
+
+/*!
+ * Action macro strings.
+ * \addtogroup action
+ * \addtogroup constant
+ */
+extern const char *_G_actMacroStrings[];
+
+/*!
  * Client bit strings.
  * \addtogroup client
  * \addtogroup constant
