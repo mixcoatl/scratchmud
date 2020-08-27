@@ -1,0 +1,9 @@
+Command:
+  Name: Thank~
+  SocialData:
+    Found: {S.Name} thank{:s} {D.Name}.~
+    FoundAuto: {S.Name} thank{:s} {S.Reflexive}.~
+    NoArgument: {S.Name} give{:s} thanks.~
+    ~
+  ~
+~

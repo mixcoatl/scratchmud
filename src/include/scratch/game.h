@@ -24,6 +24,7 @@ typedef struct _Server Server;
  * \{
  */
 struct _Game {
+  RBTree       *commands;       /*!< The command index */
   RBTree       *genders;        /*!< The gender index */
   RBTree       *objects;        /*!< The object index */
   RBTree       *players;        /*!< The player index */

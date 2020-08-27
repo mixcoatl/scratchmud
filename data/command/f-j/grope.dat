@@ -1,0 +1,8 @@
+Command:
+  Name: Grope~
+  SocialData:
+    Found: {S.Name} grope{:s} {D.Name}.~
+    FoundAuto: {S.Name} grope{:s} {S.Reflexive}.~
+    ~
+  ~
+~

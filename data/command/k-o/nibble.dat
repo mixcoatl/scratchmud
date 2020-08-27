@@ -1,0 +1,8 @@
+Command:
+  Name: Nibble~
+  SocialData:
+    Found: {S.Name} nibble{:s} on {D.Name}.~
+    FoundAuto: {S.Name} nibble{:s} on {S.Reflexive}.~
+    ~
+  ~
+~

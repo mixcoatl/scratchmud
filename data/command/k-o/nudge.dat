@@ -1,0 +1,8 @@
+Command:
+  Name: Nudge~
+  SocialData:
+    Found: {S.Name} give{:s} {D.Name} a nudge.~
+    FoundAuto: {S.Name} give{:s} {S.Reflexive} a nudge.~
+    ~
+  ~
+~

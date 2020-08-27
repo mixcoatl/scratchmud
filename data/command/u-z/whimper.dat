@@ -1,0 +1,9 @@
+Command:
+  Name: Whimper~
+  SocialData:
+    Found: {S.Name} whimper{:s} softly to {D.Name}.~
+    FoundAuto: {S.Name} whimper{:s} softly to {S.Reflexive}.~
+    NoArgument: {S.Name} whimper{:s} softly.~
+    ~
+  ~
+~

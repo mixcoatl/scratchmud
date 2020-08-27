@@ -1,0 +1,8 @@
+Command:
+  Name: Embrace~
+  SocialData:
+    Found: {S.Name} embrace{:s} {D.Name}.~
+    FoundAuto: {S.Name} embrace{:s} {S.Reflexive}.~
+    ~
+  ~
+~

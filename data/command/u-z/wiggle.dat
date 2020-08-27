@@ -1,0 +1,8 @@
+Command:
+  Name: Wiggle~
+  SocialData:
+    Found: {S.Name} wiggle{:s} {S.Determiner} bum for {D.Name}.~
+    NoArgument: {S.Name} wiggle{:s} {S.Determiner} bum.~
+    ~
+  ~
+~

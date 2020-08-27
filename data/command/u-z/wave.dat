@@ -1,0 +1,8 @@
+Command:
+  Name: Wave~
+  SocialData:
+    Found: {S.Name} wave{:s} to {D.Name}.~
+    NoArgument: {S.Name} wave{:s}.~
+    ~
+  ~
+~

@@ -1,0 +1,9 @@
+Command:
+  Name: Tap~
+  SocialData:
+    Found: {S.Name} tap{:s} {D.Name} on the shoulder.~
+    FoundAuto: {S.Name} {are:is} all tapped out.~
+    NoArgument: {S.Name} tap{:s} {S.Determiner} foot impatiently.~
+    ~
+  ~
+~

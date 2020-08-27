@@ -1,0 +1,8 @@
+Command:
+  Name: Tackle~
+  SocialData:
+    Found: {S.Name} ruthlessly tackle{:s} {D.Name} to the ground.~
+    FoundAuto: {S.Name} ruthlessly tackle{:s} {S.Reflexive} to the ground.~
+    ~
+  ~
+~

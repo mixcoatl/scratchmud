@@ -1,0 +1,8 @@
+Command:
+  Name: Beg~
+  SocialData:
+    Found: {S.Name} beg{:s} {D.Name} pitifully.~
+    NoArgument: {S.Name} beg{:s} pitifully.~
+    ~
+  ~
+~

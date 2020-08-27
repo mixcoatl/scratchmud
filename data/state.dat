@@ -1,4 +1,19 @@
 States:
+  ChangePassword:
+    StateBits:
+      Quiet: Yes~
+      ~
+    ~
+  ChangePasswordAgain:
+    StateBits:
+      Quiet: Yes~
+      ~
+    ~
+  ChangePasswordCurrent:
+    StateBits:
+      Quiet: Yes~
+      ~
+    ~
   LoginColor:
     StateBits:
       Initial: Yes~

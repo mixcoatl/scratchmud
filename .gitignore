@@ -55,6 +55,7 @@ bin/.libs/
 bin/scratchd
 
 # ScratchMUD data files
+data/.autorun.kill
 data/player/index
 data/player/a-e/*.pfile
 data/player/f-j/*.pfile

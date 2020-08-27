@@ -1,0 +1,9 @@
+Command:
+  Name: Cry~
+  SocialData:
+    Found: {S.Name} cr{y:ies} on {D.NamePossessive} shoulder.~
+    FoundAuto: {S.Name} cr{y:ies} quietly to {S.Reflexive}.~
+    NoArgument: {S.Name} cr{y:ies} {S.Determiner} eyes out.~
+    ~
+  ~
+~

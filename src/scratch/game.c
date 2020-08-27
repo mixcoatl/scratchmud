@@ -10,6 +10,7 @@
  */
 #define _SCRATCH_GAME_C_
 
+#include <scratch/command.h>
 #include <scratch/game.h>
 #include <scratch/gender.h>
 #include <scratch/log.h>
@@ -32,6 +33,9 @@
 Game *GameAlloc(void) {
   Game *game;
   MemoryCreate(game, Game, 1);
+  game->commands = RBTreeAlloc(
+	(RBTreeCompareProc) UtilityNameCmp,
+	(RBTreeFreeProc)    CommandFree);
   game->genders = RBTreeAlloc(
 	(RBTreeCompareProc) UtilityNameCmp,
 	(RBTreeFreeProc)    GenderFree);
@@ -60,6 +64,7 @@ void GameFree(Game *game) {
   if (game) {
     RBTreeFree(game->objects);
     RBTreeFree(game->players);
+    RBTreeFree(game->commands);
     RBTreeFree(game->genders);
     ServerFree(game->server);
     RBTreeFree(game->states);
@@ -101,6 +106,9 @@ void GameRun(Game *game) {
   } else {
     /* Load genders */
     GenderLoadIndex(game);
+
+    /* Load commands */
+    CommandLoadIndex(game);
 
     /* Load players */
     PlayerLoadIndex(game);

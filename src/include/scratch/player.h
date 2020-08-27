@@ -18,11 +18,14 @@
  * \addtogroup player
  * \{
  */
-#define PREF_COMPACT    (0)     /*!< Omit extra blank line before prompt */
+#define PREF_AUTOSAY    (0)     /*!< Say non-command input */
+#define PREF_COMPACT    (1)     /*!< Omit extra blank line before prompt */
+#define PREF_NO_REPEAT  (2)     /*!< Do not repeat communication commands */
 /*! \} */
 
 /*! How many PREF_x bits? */
-#define MAX_PREF_BITS	(1)
+#define MAX_PREF_BITS \
+  (PREF_NO_REPEAT - PREF_AUTOSAY + 1)
 
 /*!
  * Trust levels.

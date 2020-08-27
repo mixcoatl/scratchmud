@@ -1,0 +1,8 @@
+Command:
+  Name: Cackle~
+  SocialData:
+    Found: {S.Name} cackle{:s} insanely at {D.Name}.~
+    NoArgument: {S.Name} cackle{:s} insanely.~
+    ~
+  ~
+~

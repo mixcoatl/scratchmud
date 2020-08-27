@@ -1,0 +1,8 @@
+Command:
+  Name: Cringe~
+  SocialData:
+    Found: {S.Name} cringe{:s} away from {D.Name}.~
+    NoArgument: {S.Name} cringe{:s}.~
+    ~
+  ~
+~

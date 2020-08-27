@@ -1,0 +1,11 @@
+#!/bin/sh
+
+rm index
+for FileName in `find . -name '*.dat' -print`; do
+  cat "$FileName" | \
+	egrep 'Name:' | \
+	perl -pe 's/[ ]*Name:[ ]+(.*?)~/\1/g' >> index
+done
+
+sort -o index.new -u < index
+mv index.new index

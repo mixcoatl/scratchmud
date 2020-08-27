@@ -1,0 +1,8 @@
+Command:
+  Name: Slap~
+  SocialData:
+    Found: {S.Name} slap{:s} {D.Name}.~
+    FoundAuto: {S.Name} slap{:s} {S.Reflexive}.~
+    ~
+  ~
+~

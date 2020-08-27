@@ -1,0 +1,17 @@
+Command:
+  Children:
+    Close: ~
+    Show:
+      Children:
+        All:
+          Keywords:
+            1: ~
+            ~
+          ~
+        ~
+      ~
+    ~
+  Name: Client~
+  Trust: Wizard~
+  ~
+~

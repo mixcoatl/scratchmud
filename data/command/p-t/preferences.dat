@@ -1,0 +1,14 @@
+Command:
+  Children:
+    Show:
+      Keywords:
+        1: ~
+        ~
+      ~
+    ~
+  Keywords:
+    1: Toggle~
+    ~
+  Name: Preferences~
+  ~
+~

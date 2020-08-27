@@ -1,0 +1,9 @@
+Command:
+  Children:
+    Die: ~
+    Reboot: ~
+    ~
+  Name: Shutdown~
+  Trust: Owner~
+  ~
+~

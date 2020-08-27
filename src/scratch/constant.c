@@ -87,7 +87,9 @@ const char *_G_colorTypes[] = {
  * \addtogroup player
  */
 const char *_G_preferenceBits[] = {
-  /* 00 */ "Compact",
+  /* 00 */ "AutoSay",
+  /* 01 */ "Compact",
+  /* 02 */ "NoRepeat",
            "\n"
 };
 

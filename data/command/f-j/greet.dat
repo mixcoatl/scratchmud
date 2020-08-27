@@ -1,0 +1,8 @@
+Command:
+  Name: Greet~
+  SocialData:
+    Found: {S.Name} greet{:s} {D.Name}.~
+    FoundAuto: {S.Name} greet{:s} {S.Reflexive}.~
+    ~
+  ~
+~

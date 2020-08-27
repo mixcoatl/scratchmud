@@ -1,0 +1,9 @@
+Command:
+  Name: Growl~
+  SocialData:
+    Found: {S.Name} growl{:s} at {D.Name}.~
+    FoundAuto: {S.Name} growl{:s} to {S.Reflexive}.~
+    NoArgument: {S.Name} growl{:s}.~
+    ~
+  ~
+~

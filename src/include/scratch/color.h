@@ -35,6 +35,18 @@
   (C_NORMAL - C_BLACK + 1)
 
 /*!
+ * Message color codes.
+ * \addtogroup color
+ * \{
+ */
+#define CX_FAILED	(C_RED)
+#define CX_OKAY		(C_CYAN)
+#define CX_SAY		(C_GREEN)
+#define CX_SOCIAL	(C_MAGENTA)
+#define CX_TELL		(C_MAGENTA)
+/*! \}
+
+/*!
  * Shortcut client macros.
  * \addtogroup color
  * \{

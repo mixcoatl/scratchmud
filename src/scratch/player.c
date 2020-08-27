@@ -104,7 +104,7 @@ PlayerData *PlayerDataAlloc(void) {
   MemoryCreate(playerData, PlayerData, 1);
   playerData->password = NULL;
   playerData->playerName = NULL;
-  playerData->preferenceBits = PREF_COMPACT;
+  playerData->preferenceBits = PREF_AUTOSAY | PREF_COMPACT;
   playerData->trust = TRUST_GUEST;
   return (playerData);
 }

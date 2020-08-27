@@ -1,0 +1,8 @@
+Command:
+  Name: Hop~
+  SocialData:
+    Found: {S.Name} hop{:s} at {D.Name}.~
+    NoArgument: {S.Name} hop{:s}.~
+    ~
+  ~
+~

@@ -1,0 +1,7 @@
+Command:
+  Name: Bounce~
+  SocialData:
+    NoArgument: {S.Name} bounce{:s} around.~
+    ~
+  ~
+~

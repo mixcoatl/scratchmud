@@ -1,0 +1,9 @@
+Command:
+  Name: Scream~
+  SocialData:
+    Found: {S.Name} scream{:s} at {D.Name}.~
+    FoundAuto: {S.Name} screams{:s} at {S.Reflexive}.~
+    NoArgument: {S.Name} screams loudly.~
+    ~
+  ~
+~

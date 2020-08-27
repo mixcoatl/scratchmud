@@ -16,6 +16,7 @@
 #include <scratch/bitvector.h>
 #include <scratch/client.h>
 #include <scratch/color.h>
+#include <scratch/command.h>
 #include <scratch/editor.h>
 #include <scratch/game.h>
 #include <scratch/log.h>
@@ -624,20 +625,9 @@ STATE(LoginPasswordOnInput) {
 /*!
  * Connection state callback.
  * \param client the client
- * \param lineInput the line of user input or an empty string ("")
+ * \param input the line of user input or an empty string ("")
  */
 STATE(PlayingOnInput) {
-  if (*StringBlank(input) != '\0') {
-    RBTreeForEach(game->objects, tObjectNode) {
-      /* Iterator variable */
-      Object *tObject = tObjectNode->value;
-
-      /* Echo line input */
-      ObjectPrint(tObject, "%s%s%s: %s%s%s\r\n",
-                Q_GREEN, ObjectGetName(client->player), Q_WHITE,
-                Q_GREEN, StringBlank(input), Q_NORMAL);
-    }
-    RBTreeForEachEnd();
-  }
+  CommandInterpret(client->player, input);
   return (true);
 }
