@@ -6,6 +6,7 @@ __top_builddir__bin_scratchd_SOURCES=\
 	log.c \
 	main.c \
 	random.c \
+	rbtree.c \
 	string.c \
 	time.c \
 	utility.c
