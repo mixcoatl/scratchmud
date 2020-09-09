@@ -24,11 +24,13 @@ typedef struct _Socket Socket;
  * \addtogroup client
  * \{
  */
-#define CLIENT_PROMPT           (0)     /*!< Client needs prompt */
+#define CLIENT_COLOR            (0)     /*!< Client has color enabled */
+#define CLIENT_PROMPT           (1)     /*!< Client needs prompt */
 /*! \} */
 
 /*! How many CLIENT_x flags? */
-#define MAX_CLIENT_BITS		(1)
+#define MAX_CLIENT_BITS \
+  (CLIENT_PROMPT - CLIENT_COLOR + 1)
 
 /*! The length of an I/O buffer. */
 #define MAXLEN_IOBUF		(12288)

@@ -12,6 +12,7 @@
 
 #include <scratch/bitvector.h>
 #include <scratch/client.h>
+#include <scratch/color.h>
 #include <scratch/game.h>
 #include <scratch/log.h>
 #include <scratch/memory.h>
@@ -39,6 +40,7 @@ Client *ClientAlloc(Server *server) {
     client->socket = NULL;
 
     /* Initial client flags */
+    BitSetN(client->flags, CLIENT_COLOR);
     BitSetN(client->flags, CLIENT_PROMPT);
 
     StringSet(&client->hostname, "*Unknown*");
@@ -248,7 +250,7 @@ void ClientPutPrompt(Client *client) {
   } else if (ClientClosed(client)) {
     Log("client %s is already closed", client->name);
   } else {
-    ClientPrint(client, ":ScratchMUD:> ");
+    ClientPrint(client, "%s:ScratchMUD:%s> ", Q_RED, Q_NORMAL);
   }
 }
 
