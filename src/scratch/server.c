@@ -60,8 +60,14 @@ void ServerAccept(Server *server) {
 	ClientFree(client), client = NULL;
       }
 
-      if (client)
+      if (client) {
 	Log("Accepted client %s from %s", client->name, client->hostname);
+
+	/* Setup default TELNET options */
+	ClientPutCommand(client, DO, TELOPT_ECHO);
+	ClientPutCommand(client, DO, TELOPT_NAWS);
+	ClientPutCommand(client, WONT, TELOPT_ECHO);
+      }
     }
   }
 }

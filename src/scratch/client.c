@@ -10,6 +10,9 @@
  */
 #define _SCRATCH_CLIENT_C_
 
+#define TELCMDS
+#define TELOPTS
+
 #include <scratch/bitvector.h>
 #include <scratch/client.h>
 #include <scratch/color.h>
@@ -37,8 +40,11 @@ Client *ClientAlloc(Server *server) {
     Log("invalid `server` Server");
   } else {
     MemoryCreate(client, Client, 1);
-    client->server = server;
-    client->socket = NULL;
+    client->nawsHeight = /* default */ 25;
+    client->nawsWidth  = /* default */ 80;
+    client->server     = server;
+    client->socket     = NULL;
+    client->telstate   = CLIENT_TELSTATE_DATA;
 
     /* Initial client flags */
     BitSetN(client->flags, CLIENT_COLOR);
@@ -245,6 +251,34 @@ void ClientPrint(
 }
 
 /*!
+ * Sends a TELNET command.
+ * \addtogroup client
+ * \param client the client to which to send a TELNET command
+ * \param telcmd the TELNET command: DO, DONT, WILL, WONT, etc.
+ * \param telopt the TELNET option: TELOPT_x
+ */
+void ClientPutCommand(
+	Client *client,
+	const uint8_t telcmd,
+	const uint8_t telopt) {
+  if (!client) {
+    Log("invalid `client` Client");
+  } else {
+    if (sizeof(client->output) < client->outputN + 3) {
+      Log("Output overflow on client %s", client->name);
+      ClientClose(client);
+    } else {
+      client->output[client->outputN++] = IAC;
+      client->output[client->outputN++] = telcmd;
+      client->output[client->outputN++] = telopt;
+
+      Log("Client %s sent IAC %s %s",
+	client->name, TELCMD(telcmd), TELOPT(telopt));
+    }
+  }
+}
+
+/*!
  * Sends a prompt.
  * \addtogroup client
  * \param client the client to which to send a prompt
@@ -287,25 +321,127 @@ void ClientReceive(Client *client) {
     } else {
       register const uint8_t *p;
       for (p = messg; p < messg + nBytes; ++p) {
-	if (strchr("\b\x7f", *p) != NULL) {
-	  if (client->inputN)
-	    client->input[--client->inputN] = '\0';
-	} else if (*p == '\n') {
-	  BitSetN(client->flags, CLIENT_PROMPT);
-	  if (client->editor) {
-	    EditorAdd(client, client->input);
-	  } else {
-	    ClientPrint(client, "%s\r\n", client->input);
+	switch (client->telstate) {
+	case CLIENT_TELSTATE_DATA:
+	  if (*p == IAC) {
+	    client->telstate = CLIENT_TELSTATE_IAC;
+	  } else if (strchr("\b\x7f", *p) != NULL) {
+	    if (client->inputN)
+	      client->input[--client->inputN] = '\0';
+	  } else if (*p == '\n') {
+	    BitSetN(client->flags, CLIENT_PROMPT);
+	    if (client->editor) {
+	      EditorAdd(client, client->input);
+	    } else {
+	      ClientPrint(client, "%s\r\n", client->input);
+	    }
+	    MemoryZero(client->input, char, client->inputN);
+	    client->inputN = 0;
+	  } else if (client->inputN >= sizeof(client->input) - 1) {
+	    Log("Input overflow on client %s", client->name);
+	    ClientClose(client);
+	  } else if (isprint(*p)) {
+	    BPrintf(client->input, sizeof(client->input), client->inputN, "%c", *p);
 	  }
-	  MemoryZero(client->input, char, client->inputN);
-	  client->inputN = 0;
-	} else if (client->inputN >= sizeof(client->input) - 1) {
-	  Log("Input overflow on client %s", client->name);
-	  ClientClose(client);
-	} else if (isprint(*p)) {
-	  BPrintf(client->input, sizeof(client->input), client->inputN, "%c", *p);
+	  break;
+	case CLIENT_TELSTATE_IAC:
+	  switch (*p) {
+	  case EC:
+	    if (client->inputN)
+	      client->input[--client->inputN] = '\0';
+	    if (client->lineLength)
+	      client->lineLength--;
+	    break;
+	  case EL:
+	    while (client->inputN)
+	      client->input[--client->inputN] = '\0';
+	    client->lineLength = 0;
+	    break;
+	  case DO:
+	  case DONT:
+	  case SB:
+	  case WILL:
+	  case WONT:
+	    client->telcmd = *p;
+	    client->telstate = CLIENT_TELSTATE_TELCMD;
+	    break;
+	  default:
+	    client->telstate = CLIENT_TELSTATE_DATA;
+	    if (*p == IAC)
+	      BPrintf(client->input, sizeof(client->input), client->inputN, "%c", IAC);
+	    break;
+	  }
+	  break;
+	case CLIENT_TELSTATE_SB:
+	  if (*p == IAC) {
+	    client->telstate = CLIENT_TELSTATE_SB_IAC;
+	  } else if (sizeof(client->subneg) > client->subnegN) {
+	    client->subneg[client->subnegN++] = *p;
+	  }
+	  break;
+	case CLIENT_TELSTATE_SB_IAC:
+	  if (*p == SE) {
+	    client->telstate = CLIENT_TELSTATE_DATA;
+	    ClientReceiveTelnet(client);
+	  } else {
+	    client->telstate = CLIENT_TELSTATE_SB;
+	    if (sizeof(client->subneg) > client->subnegN)
+	      client->subneg[client->subnegN++] = *p;
+	  }
+	  break;
+	case CLIENT_TELSTATE_TELCMD:
+	  client->telopt = *p;
+	  if (client->telcmd == SB) {
+	    MemoryZero(client->subneg, uint8_t, sizeof(client->subneg));
+	    client->subnegN = 0;
+	    client->telstate = CLIENT_TELSTATE_SB;
+	  } else {
+	    client->telstate = CLIENT_TELSTATE_DATA;
+	    ClientReceiveTelnet(client);
+	  }
+	  break;
 	}
+
       }
+    }
+  }
+}
+
+/*!
+ * Processes a TELNET command.
+ * \addtogroup client
+ * \param client the client for which to process a TELNET command
+ */
+void ClientReceiveTelnet(Client *client) {
+  if (!client) {
+    Log("invalid `client` Client");
+  } else if (ClientClosed(client)) {
+    Log("client %s already closed", client->name);
+  } else {
+    switch (client->telcmd) {
+    case DO:
+    case DONT:
+    case WILL:
+    case WONT:
+      Log("Client %s received IAC %s %s",
+		client->name,
+		TELCMD(client->telcmd),
+		TELOPT(client->telopt));
+      break;
+    case SB:
+      switch (client->telopt) {
+      case TELOPT_NAWS:
+	if (client->subnegN == 4) {
+	  client->nawsWidth  = ntohs(*((uint16_t*)(client->subneg + 0)));
+	  client->nawsHeight = ntohs(*((uint16_t*)(client->subneg + 2)));
+	  Log("Client %s has window size %hu x %hu",
+		client->name,
+		client->nawsWidth,
+		client->nawsHeight);
+	}
+	break;
+      }
+      break;
     }
   }
 }

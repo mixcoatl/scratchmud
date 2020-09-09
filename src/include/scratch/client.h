@@ -33,6 +33,23 @@ typedef struct _Socket Socket;
 #define MAX_CLIENT_BITS \
   (CLIENT_PROMPT - CLIENT_COLOR + 1)
 
+/*!
+ * Client TELNET states.
+ * \addtogroup client
+ * \{
+ */
+#define CLIENT_TELSTATE_DATA    (0)     /*!< Client handling plaintext */
+#define CLIENT_TELSTATE_IAC     (1)     /*!< Client got IAC */
+#define CLIENT_TELSTATE_SB      (2)     /*!< Client got SB */
+#define CLIENT_TELSTATE_SB_IAC  (3)     /*!< Client got IAC inside SB */
+#define CLIENT_TELSTATE_TELCMD  (4)     /*!< Client got a TELNET command */
+#define CLIENT_TELSTATE_TELOPT  (5)     /*!< Client got a TELNET option */
+/*! \} */
+
+/*! How many CLIENT_TELSTATE_x constants? */
+#define MAX_CLIENT_TELSTATE_TYPES \
+  (CLIENT_TELSTATE_TELOPT - CLIENT_TELSTATE_DATA + 1)
+
 /*! The length of an I/O buffer. */
 #define MAXLEN_IOBUF		(12288)
 
@@ -49,10 +66,17 @@ struct _Client {
   size_t        inputN;         /*!< The input buffer used */
   uint16_t      lineLength;     /*!< The output line length */
   char         *name;           /*!< The client name */
+  uint16_t      nawsHeight;     /*!< The client window height */
+  uint16_t      nawsWidth;      /*!< The client window width */
   uint8_t       output[MAXLEN_IOBUF]; /*!< The output buffer */
   size_t        outputN;        /*!< The output buffer used */
+  uint8_t       subneg[MAXLEN_IOBUF]; /*!< The sub-negotiation buffer */
+  size_t        subnegN;        /*!< The sub-negotiation buffer used */
   Server       *server;         /*!< The server */
   Socket       *socket;         /*!< The client socket */
+  uint8_t       telcmd;         /*!< The TELNET command: DO, DONT, etc. */
+  int           telstate;       /*!< The TELNET state: CLIENT_TELSTATE_x */
+  uint8_t       telopt;         /*!< The TELNET option */
 };
 /*! \} */
 
@@ -128,6 +152,18 @@ void ClientPrint(
 	const char *format, ...);
 
 /*!
+ * Sends a TELNET command.
+ * \addtogroup client
+ * \param client the client to which to send a TELNET command
+ * \param telcmd the TELNET command: DO, DONT, WILL, WONT, etc.
+ * \param telopt the TELNET option: TELOPT_x
+ */
+void ClientPutCommand(
+	Client *client,
+	const uint8_t telcmd,
+	const uint8_t telopt);
+
+/*!
  * Sends a prompt.
  * \addtogroup client
  * \param client the client to which to send a prompt
@@ -140,5 +176,12 @@ void ClientPutPrompt(Client *client);
  * \param client the client upon which to receive
  */
 void ClientReceive(Client *client);
+
+/*!
+ * Processes a TELNET command.
+ * \addtogroup client
+ * \param client the client for which to process a TELNET command
+ */
+void ClientReceiveTelnet(Client *client);
 
 #endif /* _SCRATCH_CLIENT_H_ */
