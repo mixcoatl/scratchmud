@@ -14,6 +14,8 @@
 #include <scratch/log.h>
 #include <scratch/memory.h>
 #include <scratch/scratch.h>
+#include <scratch/server.h>
+#include <scratch/time.h>
 
 /*!
  * Constructs a game state.
@@ -24,6 +26,7 @@
 Game *GameAlloc(void) {
   Game *game;
   MemoryCreate(game, Game, 1);
+  game->server = ServerAlloc(game);
   game->shutdown = false;
   return (game);
 }
@@ -35,8 +38,10 @@ Game *GameAlloc(void) {
  * \sa GameAlloc()
  */
 void GameFree(Game *game) {
-  if (game)
+  if (game) {
+    ServerFree(game->server);
     MemoryFree(game);
+  }
 }
 
 /*!
@@ -71,6 +76,20 @@ void GameRun(Game *game) {
   if (!game) {
     Log("invalid `game` Game");
   } else {
-    /* Nothing yet */
+    /* Open the server port */
+    if (!ServerOpen(game->server, "", 6767))
+      return;
+
+    Log("Starting game loop");
+
+    /* Run the game loop */
+    while (!game->shutdown) {
+      Time timeout;
+      TimeSet(&timeout, 60, 0);
+
+      /* Poll for network activity */
+      ServerPoll(game->server, &timeout);
+    }
+    Log("Game loop finished");
   }
 }

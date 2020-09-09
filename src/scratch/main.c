@@ -13,6 +13,7 @@
 #include <scratch/log.h>
 #include <scratch/random.h>
 #include <scratch/scratch.h>
+#include <scratch/socket.h>
 
 /*!
  * Program entry point.
@@ -28,11 +29,19 @@ int main(int argc, const char *argv[]) {
   Log("Seeding shared RNG state");
   RandomReseedTime(&_G_random, NULL);
 
+  /* OS socket library */
+  Log("Starting OS socket library");
+  SocketStartup();
+
   /* Run the game */
   Game *game = GameAlloc();
   if (GameParseArguments(game, argv, argc))
     GameRun(game);
   GameFree(game);
+
+  /* OS socket library again */
+  Log("Terminating OS socket library");
+  SocketCleanup();
 
   return (EXIT_SUCCESS);
 }

@@ -15,6 +15,7 @@
 
 /* Forward type declarations */
 typedef struct _Game Game;
+typedef struct _Server Server;
 
 /*!
  * The game state.
@@ -22,6 +23,7 @@ typedef struct _Game Game;
  * \{
  */
 struct _Game {
+  Server       *server;         /*!< The network server */
   bool          shutdown;       /*!< The shutdown flag */
 };
 /*! \} */
