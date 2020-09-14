@@ -10,12 +10,14 @@
  */
 #define _SCRATCH_EDITOR_C_
 
+#include <scratch/bitvector.h>
 #include <scratch/client.h>
 #include <scratch/color.h>
 #include <scratch/editor.h>
 #include <scratch/log.h>
 #include <scratch/memory.h>
 #include <scratch/scratch.h>
+#include <scratch/state.h>
 #include <scratch/string.h>
 
 /* Local functions */
@@ -45,6 +47,10 @@ void EditorAbort(Client *client) {
     /* Editor cleanup */
     StringFree(client->editor->text);
     MemoryFree(client->editor);
+
+    /* Show the prompt again */
+    if (StateNeedsPrompt(client->state))
+      BitSetN(client->flags, CLIENT_PROMPT);
   }
 }
 
@@ -236,6 +242,10 @@ void EditorFinish(Client *client) {
     /* Editor cleanup */
     StringFree(client->editor->text);
     MemoryFree(client->editor);
+
+    /* Show the prompt again */
+    if (StateNeedsPrompt(client->state))
+      BitSetN(client->flags, CLIENT_PROMPT);
   }
 }
 

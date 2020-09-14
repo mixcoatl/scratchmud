@@ -41,3 +41,15 @@ const char *_G_colorTypes[] = {
   /* 08 */ "Normal",
            "\n"
 };
+
+/*!
+ * The STATE_x strings.
+ * \addtogroup constant
+ * \addtogroup state
+ */
+const char *_G_stateBits[] = {
+  /* 00 */ "Initial",
+  /* 01 */ "Prompt",
+  /* 02 */ "Quiet",
+           "\n"
+};

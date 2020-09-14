@@ -13,9 +13,12 @@
 #include <scratch/game.h>
 #include <scratch/log.h>
 #include <scratch/memory.h>
+#include <scratch/rbtree.h>
 #include <scratch/scratch.h>
 #include <scratch/server.h>
+#include <scratch/state.h>
 #include <scratch/time.h>
+#include <scratch/utility.h>
 
 /*!
  * Constructs a game state.
@@ -28,6 +31,10 @@ Game *GameAlloc(void) {
   MemoryCreate(game, Game, 1);
   game->server = ServerAlloc(game);
   game->shutdown = false;
+  game->states = RBTreeAlloc(
+	(RBTreeCompareProc) UtilityNameCmp,
+	(RBTreeFreeProc)    StateFree);
+
   return (game);
 }
 
@@ -40,6 +47,7 @@ Game *GameAlloc(void) {
 void GameFree(Game *game) {
   if (game) {
     ServerFree(game->server);
+    RBTreeFree(game->states);
     MemoryFree(game);
   }
 }
@@ -76,6 +84,9 @@ void GameRun(Game *game) {
   if (!game) {
     Log("invalid `game` Game");
   } else {
+    /* Load client states */
+    StateLoadIndex(game);
+
     /* Open the server port */
     if (!ServerOpen(game->server, "", 6767))
       return;

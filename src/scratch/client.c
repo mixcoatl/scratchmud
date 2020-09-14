@@ -24,6 +24,7 @@
 #include <scratch/server.h>
 #include <scratch/scratch.h>
 #include <scratch/socket.h>
+#include <scratch/state.h>
 #include <scratch/string.h>
 #include <scratch/utility.h>
 
@@ -44,6 +45,7 @@ Client *ClientAlloc(Server *server) {
     client->nawsWidth  = /* default */ 80;
     client->server     = server;
     client->socket     = NULL;
+    client->state      = NULL;
     client->telstate   = CLIENT_TELSTATE_DATA;
 
     /* Initial client flags */
@@ -99,6 +101,9 @@ void ClientClose(Client *client) {
     if (client->editor)
       EditorAbort(client);
 
+    /* Detach from client state */
+    ClientStateChange(client, NULL);
+
     /* Socket cleanup */
     SocketFree(client->socket);
     client->socket = NULL;
@@ -128,7 +133,8 @@ void ClientFlush(Client *client) {
     Log("client %s is already closed", client->name);
   } else {
     /* Send prompt */
-    if (ClientNeedsPrompt(client))
+    if ((StateNeedsPrompt(client->state) || client->editor) &&
+	 ClientNeedsPrompt(client))
       ClientPutPrompt(client);
 
     /* We don't need this anymore */
@@ -144,11 +150,9 @@ void ClientFlush(Client *client) {
       ClientClose(client);
     } else if (nBytes > 0) {
       /* Erase flushed output */
-      MemoryCopy(
-	client->output,
-	client->output + client->outputN,
-	uint8_t,
-	client->outputN - nBytes);
+      MemoryCopy(client->output,
+		 client->output + client->outputN, uint8_t,
+		 client->outputN - nBytes);
 
       /* Adjust output size */
       client->outputN -= nBytes;
@@ -181,7 +185,7 @@ bool ClientNeedsPrompt(const Client *client) {
   register bool result = false;
   if (!client) {
     Log("invalid `client` Client");
-  } else {
+  } else if (client->state) {
     result = BitCheckN(client->flags, CLIENT_PROMPT);
   }
   return (result);
@@ -220,7 +224,8 @@ void ClientPrint(
     /* Must have been OK then */
     } else {
       /* Interrupt */
-      if (!ClientNeedsPrompt(client) && !client->inputN)
+      if ((StateNeedsPrompt(client->state) || client->editor) &&
+	  !ClientNeedsPrompt(client) && !client->inputN)
 	BPrintf(client->output, sizeof(client->output), client->outputN, "\r\n");
 
       /* Process output */
@@ -289,7 +294,11 @@ void ClientPutPrompt(Client *client) {
   } else if (ClientClosed(client)) {
     Log("client %s is already closed", client->name);
   } else {
-    ClientPrint(client, "%s:ScratchMUD:%s> ", Q_RED, Q_NORMAL);
+    if (client->editor) {
+      ClientPrint(client, "%s> ", Q_NORMAL);
+    } else {
+      ClientPrint(client, "%s:ScratchMUD:%s> ", Q_RED, Q_NORMAL);
+    }
   }
 }
 
@@ -321,6 +330,8 @@ void ClientReceive(Client *client) {
     } else {
       register const uint8_t *p;
       for (p = messg; p < messg + nBytes; ++p) {
+	if (!client->state)
+	  break;
 	switch (client->telstate) {
 	case CLIENT_TELSTATE_DATA:
 	  if (*p == IAC) {
@@ -329,12 +340,14 @@ void ClientReceive(Client *client) {
 	    if (client->inputN)
 	      client->input[--client->inputN] = '\0';
 	  } else if (*p == '\n') {
-	    BitSetN(client->flags, CLIENT_PROMPT);
 	    if (client->editor) {
 	      EditorAdd(client, client->input);
-	    } else {
-	      ClientPrint(client, "%s\r\n", client->input);
+	    } else if (client->state && client->state->inputProc) {
+	      if (BitCheckN(client->state->flags, STATE_QUIET))
+		ClientPrint(client, "\r\n");
+	      client->state->inputProc(client, client->server->game, client->input);
 	    }
+	    BitSetN(client->flags, CLIENT_PROMPT);
 	    MemoryZero(client->input, char, client->inputN);
 	    client->inputN = 0;
 	  } else if (client->inputN >= sizeof(client->input) - 1) {
@@ -444,4 +457,85 @@ void ClientReceiveTelnet(Client *client) {
       break;
     }
   }
+}
+
+/*!
+ * Changes to another state.
+ * \addtogroup client
+ * \param client the client whose state to change
+ * \param state the state to which to change
+ * \sa ClientStateChangeByName(Client*, const char*)
+ */
+void ClientStateChange(
+	Client *client,
+	State *state) {
+  if (!client) {
+    Log("invalid `client` Client");
+  } else {
+    /* Remember which states were quiet */
+    State *lastState = client->state;
+    const bool quiet = lastState && BitCheckN(lastState->flags, STATE_QUIET);
+    const bool newQuiet = state && BitCheckN(state->flags, STATE_QUIET);
+
+    /* The current state lost focus */
+    if (client->state && client->state->focusLostProc)
+      if (!client->state->focusLostProc(client, client->server->game, ""))
+        return;
+
+    /* The new state received focus */
+    if ((client->state = state) && client->state->focusProc)
+      if (!client->state->focusProc(client, client->server->game, ""))
+        client->state = lastState;
+
+    if (quiet && !newQuiet) {
+      ClientPutCommand(client, DO, TELOPT_ECHO);
+      ClientPutCommand(client, WONT, TELOPT_ECHO);
+    }
+    if (!quiet && newQuiet) {
+      ClientPutCommand(client, DONT, TELOPT_ECHO);
+      ClientPutCommand(client, WILL, TELOPT_ECHO);
+    }
+  }
+}
+
+/*!
+ * Changes to another state.
+ * \addtogroup client
+ * \param client the client whose state to change
+ * \param stateName the state name of the state to which to change
+ * \sa ClientStateChange(Client*, State*)
+ */
+void ClientStateChangeByName(
+	Client *client,
+	const char *stateName) {
+  if (!client) {
+    Log("Invalid `client` Client");
+  } else {
+    register State *state = NULL;
+    if (*StringBlank(stateName) != '\0' &&
+       (state = StateByName(client->server->game, stateName)) == NULL)
+      Log("unknown state %s for client %s", stateName, client->name);
+    ClientStateChange(client, state);
+  }
+}
+
+/*!
+ * Connection state callback.
+ * \param client the client
+ * \param lineInput the line of user input or an empty string ("")
+ */
+STATE(PlayingOnInput) {
+  if (*StringBlank(input) != '\0') {
+    RBTreeForEach(client->server->clients, tClientNode) {
+      /* Iterator variable */
+      Client *tClient = tClientNode->value;
+
+      /* Echo line input */
+      ClientPrint(tClient, "%s%s%s: %s%s%s\r\n",
+		Q_GREEN, StringBlank(client->name), Q_WHITE,
+		Q_GREEN, StringBlank(input), Q_NORMAL);
+    }
+    RBTreeForEachEnd();
+  }
+  return (true);
 }

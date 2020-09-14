@@ -14,6 +14,7 @@ __top_builddir__bin_scratchd_SOURCES=\
 	rbtree.c \
 	server.c \
 	socket.c \
+	state.c \
 	string.c \
 	time.c \
 	utility.c

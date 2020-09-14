@@ -20,6 +20,7 @@
 #include <scratch/scratch.h>
 #include <scratch/server.h>
 #include <scratch/socket.h>
+#include <scratch/state.h>
 #include <scratch/string.h>
 #include <scratch/time.h>
 #include <scratch/utility.h>
@@ -67,6 +68,11 @@ void ServerAccept(Server *server) {
 	ClientPutCommand(client, DO, TELOPT_ECHO);
 	ClientPutCommand(client, DO, TELOPT_NAWS);
 	ClientPutCommand(client, WONT, TELOPT_ECHO);
+
+	/* Enter initial state */
+	ClientStateChange(client, StateGetInitial(server->game));
+	if (client->state && BitCheckN(client->state->flags, STATE_PROMPT))
+	  BitSetN(client->flags, CLIENT_PROMPT);
       }
     }
   }
@@ -239,7 +245,7 @@ void ServerPoll(
 	  ClientFlush(tClient);
 
 	/* Check for closed clients */
-	if (!tClient->socket)
+	if (!tClient->socket || !tClient->state)
 	  ListPushBack(removed, tClient);
       }
       RBTreeForEachEnd();

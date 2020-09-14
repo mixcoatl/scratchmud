@@ -14,7 +14,8 @@
 #include <scratch/scratch.h>
 
 /* Forward type declarations */
-typedef struct _Game Game;
+typedef struct _Game   Game;
+typedef struct _RBTree RBTree;
 typedef struct _Server Server;
 
 /*!
@@ -25,6 +26,7 @@ typedef struct _Server Server;
 struct _Game {
   Server       *server;         /*!< The network server */
   bool          shutdown;       /*!< The shutdown flag */
+  RBTree       *states;         /*!< The state index */
 };
 /*! \} */
 

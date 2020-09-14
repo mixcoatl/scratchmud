@@ -27,4 +27,11 @@ extern const char *_G_clientBits[];
  */
 extern const char *_G_colorTypes[];
 
+/*!
+ * The STATE_x strings.
+ * \addtogroup constant
+ * \addtogroup state
+ */
+extern const char *_G_stateBits[];
+
 #endif /* _SCRATCH_CONSTANT_H_ */

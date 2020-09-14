@@ -19,6 +19,7 @@ typedef struct _Client Client;
 typedef struct _Editor Editor;
 typedef struct _Server Server;
 typedef struct _Socket Socket;
+typedef struct _State  State;
 
 /*!
  * Client flags.
@@ -74,6 +75,7 @@ struct _Client {
   size_t        subnegN;        /*!< The sub-negotiation buffer used */
   Server       *server;         /*!< The server */
   Socket       *socket;         /*!< The client socket */
+  State        *state;          /*!< The state of connectedness */
   uint8_t       telcmd;         /*!< The TELNET command: DO, DONT, etc. */
   int           telstate;       /*!< The TELNET state: CLIENT_TELSTATE_x */
   uint8_t       telopt;         /*!< The TELNET option */
@@ -183,5 +185,27 @@ void ClientReceive(Client *client);
  * \param client the client for which to process a TELNET command
  */
 void ClientReceiveTelnet(Client *client);
+
+/*!
+ * Changes to another state.
+ * \addtogroup client
+ * \param client the client whose state to change
+ * \param state the state to which to change
+ * \sa ClientStateChangeByName(Client*, const char*)
+ */
+void ClientStateChange(
+	Client *client,
+	State *state);
+
+/*!
+ * Changes to another state.
+ * \addtogroup client
+ * \param client the client whose state to change
+ * \param stateName the state name of the state to which to change
+ * \sa ClientStateChange(Client*, State*)
+ */
+void ClientStateChangeByName(
+	Client *client,
+	const char *stateName);
 
 #endif /* _SCRATCH_CLIENT_H_ */

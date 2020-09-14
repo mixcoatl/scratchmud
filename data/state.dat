@@ -1,0 +1,9 @@
+States:
+  Playing:
+    StateBits:
+      Initial: Yes~
+      Prompt: Yes~
+      ~
+    ~
+  ~
+~
