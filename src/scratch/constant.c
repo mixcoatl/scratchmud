@@ -43,6 +43,16 @@ const char *_G_colorTypes[] = {
 };
 
 /*!
+ * The PREF_x strings.
+ * \addtogroup constant
+ * \addtogroup player
+ */
+const char *_G_preferenceBits[] = {
+  /* 00 */ "Compact",
+           "\n"
+};
+
+/*!
  * The STATE_x strings.
  * \addtogroup constant
  * \addtogroup state
@@ -51,5 +61,19 @@ const char *_G_stateBits[] = {
   /* 00 */ "Initial",
   /* 01 */ "Prompt",
   /* 02 */ "Quiet",
+           "\n"
+};
+
+/*!
+ * The TRUST_x strings.
+ * \addtogroup constant
+ * \addtogroup player
+ */
+const char *_G_trustTypes[] = {
+  /* 00 */ "None",
+  /* 01 */ "Guest",
+  /* 02 */ "Player",
+  /* 03 */ "Wizard",
+  /* 04 */ "Owner",
            "\n"
 };

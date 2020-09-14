@@ -54,6 +54,15 @@ dkms.conf
 bin/.libs/
 bin/scratchd
 
+# ScratchMUD data files
+data/player/index
+data/player/a-e/*.pfile
+data/player/f-j/*.pfile
+data/player/k-o/*.pfile
+data/player/p-t/*.pfile
+data/player/u-z/*.pfile
+data/player/zzz/*.pfile
+
 # ScratchMUD log files
 log/*.log
 

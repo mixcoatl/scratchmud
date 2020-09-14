@@ -50,6 +50,22 @@
 #define Q_NORMAL        ColorGet(client, C_NORMAL)
 /*! \} */
 
+/*!
+ * Shortcut actor macros.
+ * \addtogroup color
+ * \{
+ */
+#define QQ_BLACK	ColorGet(actor->client, C_BLACK)
+#define QQ_RED		ColorGet(actor->client, C_RED)
+#define QQ_GREEN	ColorGet(actor->client, C_GREEN)
+#define QQ_YELLOW	ColorGet(actor->client, C_YELLOW)
+#define QQ_BLUE		ColorGet(actor->client, C_BLUE)
+#define QQ_MAGENTA	ColorGet(actor->client, C_MAGENTA)
+#define QQ_CYAN		ColorGet(actor->client, C_CYAN)
+#define QQ_WHITE	ColorGet(actor->client, C_WHITE)
+#define QQ_NORMAL	ColorGet(actor->client, C_NORMAL)
+/*! \} */
+
 /* Forward type declarations */
 typedef struct _Client Client;
 

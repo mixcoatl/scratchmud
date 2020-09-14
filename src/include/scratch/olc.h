@@ -14,6 +14,7 @@
 #include <scratch/scratch.h>
 
 /* Forward type declarations */
+typedef struct _Object  Object;
 typedef struct _OlcData OlcData;
 typedef struct _Client  Client;
 typedef struct _State   State;
@@ -28,6 +29,8 @@ struct _OlcData {
   State        *lastState;      /*!< The previous state */
   char         *lastStateName;  /*!< The previous state name */
   char         *name;           /*!< The canonical name or NULL */
+  char         *password;       /*!< The temporary password buffer */
+  Object       *player;         /*!< The OLC player */
 };
 /*! \} */
 

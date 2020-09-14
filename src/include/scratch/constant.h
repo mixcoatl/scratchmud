@@ -28,10 +28,24 @@ extern const char *_G_clientBits[];
 extern const char *_G_colorTypes[];
 
 /*!
+ * The PREF_x strings.
+ * \addtogroup constant
+ * \addtogroup player
+ */
+extern const char *_G_preferenceBits[];
+
+/*!
  * The STATE_x strings.
  * \addtogroup constant
  * \addtogroup state
  */
 extern const char *_G_stateBits[];
+
+/*!
+ * The TRUST_x strings.
+ * \addtogroup constant
+ * \addtogroup player
+ */
+extern const char *_G_trustTypes[];
 
 #endif /* _SCRATCH_CONSTANT_H_ */

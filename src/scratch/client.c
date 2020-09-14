@@ -20,7 +20,10 @@
 #include <scratch/game.h>
 #include <scratch/log.h>
 #include <scratch/memory.h>
+#include <scratch/object.h>
 #include <scratch/olc.h>
+#include <scratch/olc_player.h>
+#include <scratch/player.h>
 #include <scratch/rbtree.h>
 #include <scratch/server.h>
 #include <scratch/scratch.h>
@@ -51,7 +54,6 @@ Client *ClientAlloc(Server *server) {
     client->telstate   = CLIENT_TELSTATE_DATA;
 
     /* Initial client flags */
-    BitSetN(client->flags, CLIENT_COLOR);
     BitSetN(client->flags, CLIENT_PROMPT);
 
     StringSet(&client->hostname, "*Unknown*");
@@ -301,6 +303,8 @@ void ClientPutPrompt(Client *client) {
   } else if (ClientClosed(client)) {
     Log("client %s is already closed", client->name);
   } else {
+    if (!BitCheckN(GetPlayerPreferenceBits(client->player), PREF_COMPACT))
+      ClientPrint(client, "\r\n");
     if (client->editor) {
       ClientPrint(client, "%s> ", Q_NORMAL);
     } else {
@@ -478,7 +482,7 @@ void ClientStateChange(
 	State *state) {
   if (!client) {
     Log("invalid `client` Client");
-  } else {
+  } else if (client->state != state) {
     /* Remember which states were quiet */
     State *lastState = client->state;
     const bool quiet = lastState && BitCheckN(lastState->flags, STATE_QUIET);
@@ -489,19 +493,16 @@ void ClientStateChange(
       if (!client->state->focusLostProc(client, client->server->game, ""))
         return;
 
+    if (!quiet && newQuiet)
+      ClientPutCommand(client, WILL, TELOPT_ECHO);
+
     /* The new state received focus */
     if ((client->state = state) && client->state->focusProc)
       if (!client->state->focusProc(client, client->server->game, ""))
         client->state = lastState;
 
-    if (quiet && !newQuiet) {
-      ClientPutCommand(client, DO, TELOPT_ECHO);
+    if (quiet && !newQuiet)
       ClientPutCommand(client, WONT, TELOPT_ECHO);
-    }
-    if (!quiet && newQuiet) {
-      ClientPutCommand(client, DONT, TELOPT_ECHO);
-      ClientPutCommand(client, WILL, TELOPT_ECHO);
-    }
   }
 }
 
@@ -529,18 +530,112 @@ void ClientStateChangeByName(
 /*!
  * Connection state callback.
  * \param client the client
+ * \param input the line of user input or an empty string ("")
+ */
+STATE(LoginColorOnFocus) {
+  ClientPrint(client, "Enable ANSI color? [Yn] > ");
+  return (true);
+}
+
+/*!
+ * Connection state callback.
+ * \param client the client
+ * \param input the line of user input or an empty string ("")
+ */
+STATE(LoginColorOnInput) {
+  input = StringSkipSpaces(input);
+  if (*input != '\0' && strchr("Nn", *input) != NULL) {
+    BitRemoveN(client->flags, CLIENT_COLOR);
+  } else {
+    BitSetN(client->flags, CLIENT_COLOR);
+  }
+  ClientStateChangeByName(client, "LoginName");
+  return (true);
+}
+
+/*!
+ * Connection state callback.
+ * \param client the client
+ * \param input the line of user input or an empty string ("")
+ */
+STATE(LoginNameOnFocus) {
+  ClientPrint(client, "%sEnter player name or \"%sNEW%s\" %s> ",
+	Q_GREEN, Q_WHITE, Q_GREEN,
+	Q_NORMAL);
+
+  return (true);
+}
+
+/*!
+ * Connection state callback.
+ * \param client the client
+ * \param input the line of user input or an empty string ("")
+ */
+STATE(LoginNameOnInput) {
+  if (*StringBlank(input) == '\0') {
+    ClientPrint(client, "%sEnter player name %s> ", Q_GREEN, Q_NORMAL);
+  } else if (StringCmpCI("NEW", input) == 0) {
+    OlcPlayerStart(client, NULL);
+  } else if (PlayerByName(client->server->game, input) == NULL) {
+    ClientPrint(client, "%sPlayer `%s%s%s` does not exist.%s\r\n", Q_GREEN, Q_WHITE, input, Q_GREEN, Q_NORMAL);
+    ClientPrint(client, "%sEnter player name %s> ", Q_GREEN, Q_NORMAL);
+  } else if ((client->player = PlayerLoad(client->server->game, input)) == NULL) {
+    ClientPrint(client, "%sPlayer `%s%s%s` could not be loaded.%s\r\n", Q_GREEN, Q_WHITE, input, Q_GREEN, Q_NORMAL);
+    ClientPrint(client, "%sEnter player name %s> ", Q_GREEN, Q_NORMAL);
+  } else {
+    ClientStateChangeByName(client, "LoginPassword");
+  }
+  return (true);
+}
+
+/*!
+ * Connection state callback.
+ * \param client the client
+ * \param input the line of user input or an empty string ("")
+ */
+STATE(LoginPasswordOnFocus) {
+  ClientPrint(client, "%sEnter password %s> ", Q_GREEN, Q_NORMAL);
+  return (true);
+}
+
+/*!
+ * Connection state callback.
+ * \param client the client
+ * \param input the line of user input or an empty string ("")
+ */
+STATE(LoginPasswordOnInput) {
+  if (*StringBlank(input) == '\0') {
+    ClientStateChangeByName(client, "LoginName");
+  } else if (!UtilityCryptMatch(client->player->playerData->password, input)) {
+    ClientPrint(client, "%sPassword doesn't match.%s\r\n", Q_GREEN, Q_NORMAL);
+    ClientStateChangeByName(client, "LoginName");
+    ObjectFree(client->player);
+    client->player = NULL;
+  } else {
+    client->player->client = client;
+    RBTreeInsert(client->server->game->objects, (RBTreeKey) &client->player->name, client->player);
+    ClientPrint(client, "%sWelcome to ScratchMUD, %s%s%s!%s\r\n",
+	Q_GREEN, Q_WHITE, client->player->playerData->playerName, Q_GREEN, Q_NORMAL);
+    ClientStateChangeByName(client, "Playing");
+  }
+  return (true);
+}
+
+/*!
+ * Connection state callback.
+ * \param client the client
  * \param lineInput the line of user input or an empty string ("")
  */
 STATE(PlayingOnInput) {
   if (*StringBlank(input) != '\0') {
-    RBTreeForEach(client->server->clients, tClientNode) {
+    RBTreeForEach(game->objects, tObjectNode) {
       /* Iterator variable */
-      Client *tClient = tClientNode->value;
+      Object *tObject = tObjectNode->value;
 
       /* Echo line input */
-      ClientPrint(tClient, "%s%s%s: %s%s%s\r\n",
-		Q_GREEN, StringBlank(client->name), Q_WHITE,
-		Q_GREEN, StringBlank(input), Q_NORMAL);
+      ObjectPrint(tObject, "%s%s%s: %s%s%s\r\n",
+                Q_GREEN, ObjectGetName(client->player), Q_WHITE,
+                Q_GREEN, StringBlank(input), Q_NORMAL);
     }
     RBTreeForEachEnd();
   }

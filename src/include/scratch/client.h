@@ -17,6 +17,7 @@
 /* Forward type declarations */
 typedef struct _Client  Client;
 typedef struct _Editor  Editor;
+typedef struct _Object  Object;
 typedef struct _OlcData OlcData;
 typedef struct _Server  Server;
 typedef struct _Socket  Socket;
@@ -73,6 +74,7 @@ struct _Client {
   OlcData      *olc;            /*!< The OLC state */
   uint8_t       output[MAXLEN_IOBUF]; /*!< The output buffer */
   size_t        outputN;        /*!< The output buffer used */
+  Object       *player;         /*!< The player object */
   uint8_t       subneg[MAXLEN_IOBUF]; /*!< The sub-negotiation buffer */
   size_t        subnegN;        /*!< The sub-negotiation buffer used */
   Server       *server;         /*!< The server */

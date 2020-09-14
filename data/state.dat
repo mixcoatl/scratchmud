@@ -1,7 +1,37 @@
 States:
-  Playing:
+  LoginColor:
     StateBits:
       Initial: Yes~
+      ~
+    ~
+  LoginName: ~
+  LoginPassword:
+    StateBits:
+      Quiet: Yes~
+      ~
+    ~
+  OlcPlayer: ~
+  OlcPlayerConfirm: ~
+  OlcPlayerGender: ~
+  OlcPlayerPassword:
+    StateBits:
+      Quiet: Yes~
+      ~
+    ~
+  OlcPlayerPasswordAgain:
+    StateBits:
+      Quiet: Yes~
+      ~
+    ~
+  OlcPlayerPasswordCurrent:
+    StateBits:
+      Quiet: Yes~
+      ~
+    ~
+  OlcPlayerPlayerName: ~
+  OlcPlayerPreferenceBits: ~
+  Playing:
+    StateBits:
       Prompt: Yes~
       ~
     ~

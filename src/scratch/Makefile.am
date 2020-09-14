@@ -12,7 +12,10 @@ __top_builddir__bin_scratchd_SOURCES=\
 	list.c \
 	log.c \
 	main.c \
+	object.c \
 	olc.c \
+	olc_player.c \
+	player.c \
 	random.c \
 	rbtree.c \
 	server.c \
