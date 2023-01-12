@@ -8,6 +8,7 @@
  * \author Geoffrey Davis <gdavis@scratchmud.org>
  * \addtogroup main
  */
+#include <scratch/log.h>
 #include <scratch/scratch.h>
 
 /* Local functions. */
@@ -21,5 +22,6 @@ int main(int argc, const char *argv[]);
  * \return zero for normal program termination, non-zero otherwise
  */
 int main(int argc, const char *argv[]) {
+  Log(L_MAIN, "Starting `" PACKAGE_STRING "`.");
   return (EXIT_SUCCESS);
 }
