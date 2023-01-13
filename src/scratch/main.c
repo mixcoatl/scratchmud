@@ -8,6 +8,7 @@
  * \author Geoffrey Davis <gdavis@scratchmud.org>
  * \addtogroup main
  */
+#include <scratch/game.h>
 #include <scratch/log.h>
 #include <scratch/scratch.h>
 
@@ -22,6 +23,15 @@ int main(int argc, const char *argv[]);
  * \return zero for normal program termination, non-zero otherwise
  */
 int main(int argc, const char *argv[]) {
-  Log(L_MAIN, "Starting `" PACKAGE_STRING "`.");
+  /* Run game */
+  Log(L_MAIN, "Starting game.");
+  Game *game = GameAlloc();
+  if (GameParseArguments(game, argv, argc)) {
+    GameRun(game);
+  }
+  GameFree(game);
+
+  /* Exit */
+  Log(L_MAIN, "Exiting.");
   return (EXIT_SUCCESS);
 }
