@@ -152,4 +152,7 @@ static size_t strlcpy(char *dst, const char *src, size_t dstsize) {
  */
 #define MAXLEN_STRING (8192)
 
+/* Forward type declarations */
+typedef struct timeval Time;
+
 #endif /* _SCRATCH_H_ */

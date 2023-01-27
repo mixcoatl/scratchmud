@@ -3,5 +3,6 @@ __top_builddir__bin_scratch_LDFLAGS=-rdynamic
 __top_builddir__bin_scratch_SOURCES=\
 	game.c \
 	log.c \
-	main.c
+	main.c \
+	time.c
 
