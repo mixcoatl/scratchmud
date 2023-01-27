@@ -1,6 +1,7 @@
 bin_PROGRAMS=$(top_builddir)/bin/scratch
 __top_builddir__bin_scratch_LDFLAGS=-rdynamic
 __top_builddir__bin_scratch_SOURCES=\
+	dice.c \
 	game.c \
 	log.c \
 	main.c \
