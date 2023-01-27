@@ -9,5 +9,6 @@ __top_builddir__bin_scratch_SOURCES=\
 	random.c \
 	string.c \
 	time.c \
+	tree.c \
 	utility.c
 
