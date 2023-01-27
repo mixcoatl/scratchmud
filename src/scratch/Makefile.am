@@ -3,6 +3,7 @@ __top_builddir__bin_scratch_LDFLAGS=-rdynamic
 __top_builddir__bin_scratch_SOURCES=\
 	dice.c \
 	game.c \
+	list.c \
 	log.c \
 	main.c \
 	random.c \
