@@ -4,5 +4,6 @@ __top_builddir__bin_scratch_SOURCES=\
 	game.c \
 	log.c \
 	main.c \
+	random.c \
 	time.c
 

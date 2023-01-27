@@ -10,6 +10,7 @@
  */
 #include <scratch/game.h>
 #include <scratch/log.h>
+#include <scratch/random.h>
 #include <scratch/scratch.h>
 
 /* Local functions. */
@@ -23,6 +24,10 @@ int main(int argc, const char *argv[]);
  * \return zero for normal program termination, non-zero otherwise
  */
 int main(int argc, const char *argv[]) {
+  /* Configure RNG state */
+  Log(L_MAIN, "Seeding shared RNG state.");
+  RandomReseedTime(&g_random, NULL);
+
   /* Run game */
   Log(L_MAIN, "Starting game.");
   Game *game = GameAlloc();
