@@ -20,6 +20,7 @@
 typedef struct Creator Creator;
 typedef struct Descriptor Descriptor;
 typedef struct DescriptorBits DescriptorBits;
+typedef struct Editor Editor;
 typedef struct Game Game;
 typedef struct Socket Socket;
 typedef struct State State;
@@ -43,6 +44,7 @@ struct DescriptorBits {
 struct Descriptor {
   DescriptorBits        bits;           /*!< The descriptor bits */
   Creator              *creator;        /*!< The OLC state */
+  Editor               *editor;         /*!< The string editor */
   Game                 *game;           /*!< The game state */
   char                 *hostname;       /*!< The remote name */
   char                  input[MAXLEN_INPUT];   /*!< The input buffer */

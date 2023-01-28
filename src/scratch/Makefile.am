@@ -5,6 +5,7 @@ __top_builddir__bin_scratch_SOURCES=\
 	data.c \
 	descriptor.c \
 	dice.c \
+	editor.c \
 	game.c \
 	list.c \
 	log.c \

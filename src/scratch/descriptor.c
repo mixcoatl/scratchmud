@@ -15,6 +15,7 @@
 
 #include <scratch/descriptor.h>
 #include <scratch/creator.h>
+#include <scratch/editor.h>
 #include <scratch/game.h>
 #include <scratch/log.h>
 #include <scratch/memory.h>
@@ -48,6 +49,7 @@ Descriptor *DescriptorAlloc(Game *game) {
     d->bits.prompt = false;
     d->bits.sb = false;
     d->creator = NULL;
+    d->editor = NULL;
     d->game = game;
     d->hostname = NULL;
     d->inputN = 0;
@@ -109,6 +111,10 @@ void DescriptorClose(Descriptor *d) {
   if (!d) {
     Log(L_ASSERT, "Invalid `d` Descriptor.");
   } else {
+    /* Abort string editor */
+    if (d->editor)
+      EditorAbort(d);
+
     /* Detach creator */
     if (d->creator) {
       CreatorFree(d->creator);
@@ -390,7 +396,9 @@ static void DescriptorReceiveInput(Descriptor *d) {
       DescriptorPrint(d, "\r\n");
 
     /* Handle received input */
-    if (d->state && d->state->received)
+    if (d->editor)
+      EditorAdd(d, d->input);
+    else if (d->state && d->state->received)
       d->state->received(d, d->game, d->input);
 
     d->bits.prompt = true;
