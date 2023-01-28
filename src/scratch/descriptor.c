@@ -13,6 +13,7 @@
 #define TELCMDS
 #define TELOPTS
 
+#include <scratch/color.h>
 #include <scratch/descriptor.h>
 #include <scratch/creator.h>
 #include <scratch/editor.h>
@@ -46,6 +47,7 @@ Descriptor *DescriptorAlloc(Game *game) {
     MemoryCreate(d, Descriptor, 1);
     MemoryZero(d->input, char, sizeof(d->input));
     MemoryZero(d->sb, char, sizeof(d->sb));
+    d->bits.color = false;
     d->bits.prompt = false;
     d->bits.sb = false;
     d->creator = NULL;
@@ -307,7 +309,7 @@ void DescriptorPutPrompt(Descriptor *d) {
   } else if (DescriptorClosed(d)) {
     Log(L_ASSERT, "Descriptor %s is already closed.", d->name);
   } else {
-    DescriptorPrint(d, ":ScratchMUD:> ");
+    DescriptorPrint(d, "%s:%sScratchMUD%s:> %s", Q_GRAY, Q_PINK, Q_GRAY, Q_NORMAL);
   }
 }
 
@@ -519,7 +521,9 @@ STATE(PlayingOnReceived) {
   } else {
     TreeForEach(game->descriptors, tDescNode) {
       Descriptor *tDesc = tDescNode->mappingValue;
-      DescriptorPrint(tDesc, "From %s: %s\r\n", d->name, input);
+      DescriptorPrint(tDesc, "%sFrom %s%s%s: %s%s%s\r\n",
+		QX_PROMPT, QX_EMPHASIS, d->name, QX_PUNCTUATION,
+		QX_PROMPT, input, Q_NORMAL);
     }
   }
   return (true);

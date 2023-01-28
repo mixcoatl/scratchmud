@@ -31,6 +31,7 @@ typedef struct State State;
  * \{
  */
 struct DescriptorBits {
+  uint8_t               color: 1;       /*!< Descriptor has color enabled */
   uint8_t               prompt: 1;      /*!< Descriptor needs prompt */
   uint8_t               sb: 1;          /*!< Descriptor received telnet SB */
 };

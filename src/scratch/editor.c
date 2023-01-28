@@ -10,6 +10,7 @@
  */
 #define _SCRATCH_EDITOR_C_
 
+#include <scratch/color.h>
 #include <scratch/descriptor.h>
 #include <scratch/editor.h>
 #include <scratch/log.h>
@@ -66,7 +67,7 @@ void EditorAdd(
 
     /* Failed to add to string editor buffer */
     if (d->editor->stringN == stringN)
-      DescriptorPrint(d, "String too long.  Last line skipped.\r\n");
+      DescriptorPrint(d, "%sString too long.  Last line skipped.%s\r\n", QX_FAILED, Q_NORMAL);
   }
 }
 
@@ -82,29 +83,36 @@ static EDITORCOMMAND(EditorCommandClear) {
   d->editor->stringN = 0;
 
   /* Tell player */
-  DescriptorPrint(d, "String editor buffer cleared.\r\n");
+  DescriptorPrint(d, "%sString editor buffer cleared.%s\r\n", QX_OKAY, Q_NORMAL);
 }
 
 /*! The /HELP editor command. */
 static EDITORCOMMAND(EditorCommandHelp) {
   DescriptorPrint(d,
-	"String editor commands:\r\n"
-	"/Abort Aborts string editor.\r\n"
-	"/Clear Clears string editor buffer.\r\n"
-	"/Help  Prints string editor commands.\r\n"
-	"/List  Prints string editor buffer.\r\n"
-	"/Save  Saves text and exits string editor.\r\n");
+	"%sString editor commands:%s\r\n"
+	" %s* %s/Abort %s- %sAborts string editor.%s\r\n"
+	" %s* %s/Clear %s- %sClears string editor buffer.%s\r\n"
+	" %s* %s/Help  %s- %sPrints string editor commands.%s\r\n"
+	" %s* %s/List  %s- %sPrints string editor buffer.%s\r\n"
+	" %s* %s/Save  %s- %sSaves text and exits string editor.%s\r\n",
+	QX_PROMPT, Q_NORMAL,
+	QX_PUNCTUATION, QX_EMPHASIS, QX_PUNCTUATION, QX_PROMPT, Q_NORMAL,
+	QX_PUNCTUATION, QX_EMPHASIS, QX_PUNCTUATION, QX_PROMPT, Q_NORMAL,
+	QX_PUNCTUATION, QX_EMPHASIS, QX_PUNCTUATION, QX_PROMPT, Q_NORMAL,
+	QX_PUNCTUATION, QX_EMPHASIS, QX_PUNCTUATION, QX_PROMPT, Q_NORMAL,
+	QX_PUNCTUATION, QX_EMPHASIS, QX_PUNCTUATION, QX_PROMPT, Q_NORMAL);
 }
 
 /*! The /LIST editor command. */
 static EDITORCOMMAND(EditorCommandList) {
   if (!d->editor->stringN) {
-    DescriptorPrint(d, "String editor buffer is empty.\r\n");
+    DescriptorPrint(d, "%sString editor buffer is empty.%s\r\n", QX_FAILED, Q_NORMAL);
   } else {
     DescriptorPrint(d,
-	"String editor buffer:\r\n"
-	"%s",
-	d->editor->string);
+	"%sString editor buffer:%s\r\n"
+	"%s%s%s",
+	QX_PROMPT, Q_NORMAL,
+	QX_TEXT, d->editor->string, Q_NORMAL);
   }
 }
 
@@ -158,7 +166,7 @@ bool EditorAddInterpret(
       commands[commandN].function(d, d->game, input);
       result = true;
     } else if (*name == '/') {
-      DescriptorPrint(d, "Unknown %s string editor command.\r\n", name);
+      DescriptorPrint(d, "%sUnknown %s string editor command.%s\r\n", QX_FAILED, name, Q_NORMAL);
       result = true;
     }
   }
@@ -264,14 +272,18 @@ void EditorStart(
     Log(L_ASSERT, "Invalid `d` Descriptor.");
   } else if (d->editor) {
     Log(L_ASSERT, "Descriptor %s already has string editor.", d->name);
-    DescriptorPrint(d, "You're already editing something!\r\n");
+    DescriptorPrint(d, "%sYou're already editing something!%s\r\n", QX_FAILED, Q_NORMAL);
   } else {
     /* Create string editor */
     d->editor = EditorAlloc(maximum, aborted, finished, userData);
 
     /* Some basic instructions */
     DescriptorPrint(d,
-	"Type /Save to save, /Abort to abort, or /Help for more commands.\r\n");
+	"%sType %s/Save %sto save, %s/Abort %sto abort, or %s/Help %sfor more commands.%s\r\n",
+	QX_PROMPT, QX_EMPHASIS,
+	QX_PROMPT, QX_EMPHASIS,
+	QX_PROMPT, QX_EMPHASIS,
+	QX_PROMPT, Q_NORMAL);
 
     /* The initial editor content */
     if (str && *str != '\0') {
@@ -280,7 +292,7 @@ void EditorStart(
 	d->editor->stringN = maximum - 1;
 
       strlcpy(d->editor->string, str, d->editor->maximum);
-      DescriptorPrint(d, "%s", d->editor->string);
+      DescriptorPrint(d, "%s%s%s", QX_TEXT, d->editor->string, Q_NORMAL);
     }
   }
 }
