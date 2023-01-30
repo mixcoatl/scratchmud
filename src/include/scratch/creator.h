@@ -15,6 +15,7 @@
 
 /* Forward type declarations */
 typedef struct Creator Creator;
+typedef struct User User;
 
 /*!
  * The creator state structure.
@@ -24,6 +25,8 @@ typedef struct Creator Creator;
 struct Creator {
   bool                  modified;       /*!< The modification flag */
   char                 *name;           /*!< The canonical name or NULL */
+  char                 *password;       /*!< The temporary password buffer */
+  User                 *user;           /*!< The user */
 };
 /*! \} */
 

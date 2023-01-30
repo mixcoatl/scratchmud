@@ -89,6 +89,15 @@ missing
 ar-lib
 *.dirstamp
 
+# ScratchMUD user files
+data/user/index
+data/user/a-e/*.dat
+data/user/f-j/*.dat
+data/user/k-o/*.dat
+data/user/p-t/*.dat
+data/user/u-z/*.dat
+data/user/zzz/*.dat
+
 # ScratchMUD source files
 Makefile
 Makefile.in

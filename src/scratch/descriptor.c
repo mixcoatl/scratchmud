@@ -14,8 +14,8 @@
 #define TELOPTS
 
 #include <scratch/color.h>
-#include <scratch/descriptor.h>
 #include <scratch/creator.h>
+#include <scratch/descriptor.h>
 #include <scratch/editor.h>
 #include <scratch/game.h>
 #include <scratch/log.h>
@@ -25,9 +25,16 @@
 #include <scratch/state.h>
 #include <scratch/string.h>
 #include <scratch/tree.h>
+#include <scratch/user.h>
 #include <scratch/utility.h>
 
 /* Local functions */
+STATE(LoginOnFocus);
+STATE(LoginOnReceived);
+STATE(LoginPasswordOnFocus);
+STATE(LoginPasswordOnReceived);
+STATE(LoginUserIdOnFocus);
+STATE(LoginUserIdOnReceived);
 STATE(PlayingOnReceived);
 
 /*!
@@ -515,14 +522,86 @@ void DescriptorReceive(Descriptor *d) {
 }
 
 /*! Descriptor state function. */
+STATE(LoginOnFocus) {
+  DescriptorPrint(d, "Enable ANSI color? [Y/n] > ");
+  return (true);
+}
+
+/*! Descriptor state function. */
+STATE(LoginOnReceived) {
+  /* Read response */
+  char arg[MAXLEN_INPUT];
+  input = StringOneWord(arg, sizeof(arg), input);
+
+  if (*arg != '\0' && strchr("Nn", *arg) != NULL) {
+    d->bits.color = false;
+  } else {
+    d->bits.color = true;
+  }
+  StateChangeByName(d, "LoginUserId");
+  return (true);
+}
+
+/*! Descriptor state function. */
+STATE(LoginPasswordOnFocus) {
+  DescriptorPrint(d, "%sEnter password %s> %s", QX_PROMPT, QX_PUNCTUATION, Q_NORMAL);
+  return (true);
+}
+
+/*! Descriptor state function. */
+STATE(LoginPasswordOnReceived) {
+  if (!input || *input == '\0') {
+    StateChangeByName(d, "LoginUserId");
+  } else if (!UtilityCryptMatch(d->user->password, input)) {
+    DescriptorPrint(d, "%sPassword doesn't match.%s\r\n", QX_FAILED, Q_NORMAL);
+    StateChangeByName(d, "LoginUserId");
+    d->user = NULL;
+  } else {
+    /* Update user */
+    d->user->lastLogon = time(0);
+    UserSave(game, d->user);
+
+    DescriptorPrint(d, "%sWelcome to ScratchMUD, %s%s%s!%s\r\n", QX_PROMPT, QX_EMPHASIS, d->user->userId, QX_PROMPT, Q_NORMAL);
+    StateChangeByName(d, "Playing");
+  }
+  return (true);
+}
+
+/*! Descriptor state function. */
+STATE(LoginUserIdOnFocus) {
+  DescriptorPrint(d, "%sEnter user ID or \"%sNEW%s\" %s> %s", QX_PROMPT, QX_EMPHASIS, QX_PROMPT, QX_PUNCTUATION, Q_NORMAL);
+  return (true);
+}
+
+/*! Descriptor state function. */
+STATE(LoginUserIdOnReceived) {
+  if (!input || *input == '\0') {
+    LoginUserIdOnFocus(d, game, "");
+  } else if (!StringCaseCompare("NEW", input)) {
+    UserStartCreator(d, NULL);
+  } else if ((d->user = UserByUserId(game, input)) == NULL) {
+    DescriptorPrint(d, "%sUser `%s` does not exist.%s\r\n", QX_FAILED, input, Q_NORMAL);
+    LoginUserIdOnFocus(d, game, "");
+  } else {
+    StateChangeByName(d, "LoginPassword");
+  }
+  return (true);
+}
+
+/*! Descriptor state function. */
 STATE(PlayingOnReceived) {
-  if (!StringCaseCompare("quit", input)) {
+  if (!d->user) {
+    DescriptorClose(d);
+  } else if (!StringCaseCompare("quit", input)) {
+    /* Update user */
+    d->user->lastLogoff = time(0);
+    UserSave(game, d->user);
     DescriptorClose(d);
   } else {
     TreeForEach(game->descriptors, tDescNode) {
       Descriptor *tDesc = tDescNode->mappingValue;
       DescriptorPrint(tDesc, "%sFrom %s%s%s: %s%s%s\r\n",
-		QX_PROMPT, QX_EMPHASIS, d->name, QX_PUNCTUATION,
+		QX_PROMPT, QX_EMPHASIS, d->user->userId, QX_PUNCTUATION,
 		QX_PROMPT, input, Q_NORMAL);
     }
   }

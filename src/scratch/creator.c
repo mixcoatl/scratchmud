@@ -15,6 +15,7 @@
 #include <scratch/memory.h>
 #include <scratch/scratch.h>
 #include <scratch/string.h>
+#include <scratch/user.h>
 
 /*!
  * Constructs a new creator state.
@@ -28,6 +29,8 @@ Creator *CreatorAlloc(void) {
   MemoryCreate(creator, Creator, 1);
   creator->modified     = false;
   creator->name         = NULL;
+  creator->password = NULL;
+  creator->user = NULL;
   return (creator);
 }
 
@@ -41,6 +44,8 @@ Creator *CreatorAlloc(void) {
 void CreatorFree(Creator *creator) {
   if (creator) {
     StringFree(creator->name);
+    StringFree(creator->password);
+    UserFree(creator->user);
     MemoryFree(creator);
   }
 }

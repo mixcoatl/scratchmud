@@ -20,6 +20,7 @@
 #include <scratch/state.h>
 #include <scratch/time.h>
 #include <scratch/tree.h>
+#include <scratch/user.h>
 #include <scratch/utility.h>
 
 /*!
@@ -90,6 +91,7 @@ Game *GameAlloc(void) {
   game->shutdown = false;
   game->socket = NULL;
   game->states = TreeAlloc(UtilityNameCompareV, NULL, StateFreeV);
+  game->users = TreeAlloc(UtilityNameCompareV, NULL, UserFreeV);
   return (game);
 }
 
@@ -262,6 +264,9 @@ void GameRun(Game *game) {
   } else {
     /* Load connection states */
     StateLoadIndex(game);
+
+    /* Load users */
+    UserLoadIndex(game);
 
     /* Open server */
     GameOpen(game, "", 6767);

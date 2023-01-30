@@ -24,6 +24,7 @@ typedef struct Editor Editor;
 typedef struct Game Game;
 typedef struct Socket Socket;
 typedef struct State State;
+typedef struct User User;
 
 /*!
  * The descriptor bitfield structure.
@@ -60,6 +61,7 @@ struct Descriptor {
   State                *state;          /*!< The state of connectedness */
   uint8_t               telnetCommand;  /*!< The telnet command: DO, DONT, etc. */
   uint8_t               telnetOption;   /*!< The telnet option: TELOPT_x */
+  User                 *user;           /*!< The connected user */
   uint16_t              windowHeight;   /*!< The window height: default=25 */
   uint16_t              windowWidth;    /*!< The window width: default=80 */
 };

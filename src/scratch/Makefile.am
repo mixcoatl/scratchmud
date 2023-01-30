@@ -3,6 +3,7 @@ __top_builddir__bin_scratch_LDFLAGS=-rdynamic
 __top_builddir__bin_scratch_SOURCES=\
 	color.c \
 	creator.c \
+	creator_user.c \
 	data.c \
 	descriptor.c \
 	dice.c \
@@ -17,5 +18,6 @@ __top_builddir__bin_scratch_SOURCES=\
 	string.c \
 	time.c \
 	tree.c \
+	user.c \
 	utility.c
 

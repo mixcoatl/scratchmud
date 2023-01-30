@@ -24,6 +24,7 @@
 #define L_NETWORK	"Network"	/*!< Network server messages */
 #define L_STATE		"State"		/*!< Connection state messages */
 #define L_SYSTEM	"System"	/*!< System errors, status, etc. */
+#define L_USER		"User"		/*!< User messages */
 /*! \} */
 
 /*!
