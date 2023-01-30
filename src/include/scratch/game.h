@@ -27,6 +27,7 @@ struct Game {
   Tree                 *descriptors;    /*!< The descriptor index */
   bool                  shutdown;       /*!< The shutdown flag */
   Socket               *socket;         /*!< The control socket */
+  Tree                 *states;         /*!< The state index */
 };
 /*! \} */
 

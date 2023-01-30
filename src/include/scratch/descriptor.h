@@ -22,6 +22,7 @@ typedef struct Descriptor Descriptor;
 typedef struct DescriptorBits DescriptorBits;
 typedef struct Game Game;
 typedef struct Socket Socket;
+typedef struct State State;
 
 /*!
  * The descriptor bitfield structure.
@@ -53,6 +54,7 @@ struct Descriptor {
   char                  sb[MAXLEN_INPUT];      /*!< The telnet SB input buffer */
   size_t                sbN;            /*!< The telnet SB input buffer used */
   Socket               *socket;         /*!< The descriptor socket */
+  State                *state;          /*!< The state of connectedness */
   uint8_t               telnetCommand;  /*!< The telnet command: DO, DONT, etc. */
   uint8_t               telnetOption;   /*!< The telnet option: TELOPT_x */
   uint16_t              windowHeight;   /*!< The window height: default=25 */

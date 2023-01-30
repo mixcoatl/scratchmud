@@ -20,9 +20,13 @@
 #include <scratch/memory.h>
 #include <scratch/scratch.h>
 #include <scratch/socket.h>
+#include <scratch/state.h>
 #include <scratch/string.h>
 #include <scratch/tree.h>
 #include <scratch/utility.h>
+
+/* Local functions */
+STATE(PlayingOnReceived);
 
 /*!
  * Constructs a new descriptor.
@@ -41,7 +45,7 @@ Descriptor *DescriptorAlloc(Game *game) {
     MemoryCreate(d, Descriptor, 1);
     MemoryZero(d->input, char, sizeof(d->input));
     MemoryZero(d->sb, char, sizeof(d->sb));
-    d->bits.prompt = true;
+    d->bits.prompt = false;
     d->bits.sb = false;
     d->creator = NULL;
     d->game = game;
@@ -50,6 +54,7 @@ Descriptor *DescriptorAlloc(Game *game) {
     d->name = NULL;
     d->sbN = 0;
     d->socket = NULL;
+    d->state = NULL;
     d->telnetCommand = 0;
     d->telnetOption = 0;
     d->windowHeight = /* default */ 25;
@@ -110,6 +115,9 @@ void DescriptorClose(Descriptor *d) {
       d->creator = NULL;
     }
 
+    /* Detach descriptor state */
+    StateChange(d, NULL);
+
     /* Socket cleanup */
     SocketFree(d->socket);
     d->socket = NULL;
@@ -140,7 +148,8 @@ void DescriptorFlush(Descriptor *d) {
   } else {
     /* Send prompt */
     if (d->bits.prompt) {
-      DescriptorPutPrompt(d);
+      if (d->state && d->state->bits.prompt)
+	DescriptorPutPrompt(d);
       d->bits.prompt = false;
     }
 
@@ -223,8 +232,10 @@ void DescriptorPrint(
     /* Must have been OK then */
     } else {
       /* Interrupt */
-      if (!d->bits.prompt && !d->inputN)
-	BPrintf(d->output, sizeof(d->output), d->outputN, "\r\n");
+      if (!d->bits.prompt && !d->inputN) {
+	if (d->state && d->state->bits.prompt)
+	  BPrintf(d->output, sizeof(d->output), d->outputN, "\r\n");
+      }
 
       /* Process output */
       register const char *p = messg;
@@ -374,7 +385,14 @@ static void DescriptorReceiveInput(Descriptor *d) {
   } else if (DescriptorClosed(d)) {
     Log(L_ASSERT, "Descriptor %s is already closed.", d->name);
   } else {
-    DescriptorPrint(d, "%s\r\n", d->input);
+    /* Send new-line in quiet mode */
+    if (d->state && d->state->bits.quiet)
+      DescriptorPrint(d, "\r\n");
+
+    /* Handle received input */
+    if (d->state && d->state->received)
+      d->state->received(d, d->game, d->input);
+
     d->bits.prompt = true;
   }
 }
@@ -484,4 +502,17 @@ void DescriptorReceive(Descriptor *d) {
       }
     }
   }
+}
+
+/*! Descriptor state function. */
+STATE(PlayingOnReceived) {
+  if (!StringCaseCompare("quit", input)) {
+    DescriptorClose(d);
+  } else {
+    TreeForEach(game->descriptors, tDescNode) {
+      Descriptor *tDesc = tDescNode->mappingValue;
+      DescriptorPrint(tDesc, "From %s: %s\r\n", d->name, input);
+    }
+  }
+  return (true);
 }

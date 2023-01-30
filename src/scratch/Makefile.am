@@ -11,6 +11,7 @@ __top_builddir__bin_scratch_SOURCES=\
 	main.c \
 	random.c \
 	socket.c \
+	state.c \
 	string.c \
 	time.c \
 	tree.c \

@@ -1,1 +1,3 @@
 This directory is for game configuration and data files.
+
+state.dat       - The descriptor state index.

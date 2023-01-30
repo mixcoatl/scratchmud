@@ -17,6 +17,7 @@
 #include <scratch/memory.h>
 #include <scratch/scratch.h>
 #include <scratch/socket.h>
+#include <scratch/state.h>
 #include <scratch/time.h>
 #include <scratch/tree.h>
 #include <scratch/utility.h>
@@ -66,6 +67,11 @@ void GameAccept(Game *game) {
 	DescriptorPutCommand(d, DO, TELOPT_ECHO);   /* Remote echo */
 	DescriptorPutCommand(d, WONT, TELOPT_ECHO); /* Local won't echo */
 	DescriptorPutCommand(d, DO, TELOPT_NAWS);   /* Remote NAWS */
+
+	/* Enter initial state */
+	StateChange(d, StateInitial(game));
+	if (d->state && d->state->bits.prompt)
+	  d->bits.prompt = true;
       }
     }
   }
@@ -83,6 +89,7 @@ Game *GameAlloc(void) {
   game->descriptors = TreeAlloc(UtilityNameCompareV, NULL, DescriptorFreeV);
   game->shutdown = false;
   game->socket = NULL;
+  game->states = TreeAlloc(UtilityNameCompareV, NULL, StateFreeV);
   return (game);
 }
 
@@ -95,6 +102,7 @@ Game *GameAlloc(void) {
 void GameFree(Game *game) {
   if (game) {
     TreeFree(game->descriptors);
+    TreeFree(game->states);
     SocketClose(game->socket);
     MemoryFree(game);
   }
@@ -252,6 +260,9 @@ void GameRun(Game *game) {
   if (!game) {
     Log(L_ASSERT, "Invalid `game` Game.");
   } else {
+    /* Load connection states */
+    StateLoadIndex(game);
+
     /* Open server */
     GameOpen(game, "", 6767);
     if (SocketClosed(game->socket))
