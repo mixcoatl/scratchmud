@@ -15,6 +15,8 @@
 
 /* Forward type declarations */
 typedef struct Game Game;
+typedef struct Socket Socket;
+typedef struct Tree Tree;
 
 /*!
  * The game state.
@@ -22,9 +24,18 @@ typedef struct Game Game;
  * \{
  */
 struct Game {
+  Tree                 *descriptors;    /*!< The descriptor index */
   bool                  shutdown;       /*!< The shutdown flag */
+  Socket               *socket;         /*!< The control socket */
 };
 /*! \} */
+
+/*!
+ * Accepts a descriptor.
+ * \addtogroup game
+ * \param game the game state
+ */
+void GameAccept(Game *game);
 
 /*!
  * Constructs a new game state.
@@ -43,6 +54,18 @@ Game *GameAlloc(void);
 void GameFree(Game *game);
 
 /*!
+ * Opens the server socket.
+ * \addtogroup game
+ * \param game the game state
+ * \param address the local endpoint address
+ * \param port the local endpoint port
+ */
+void GameOpen(
+	Game *game,
+	const char *address,
+	const uint16_t port);
+
+/*!
  * Parses command line arguments.
  * \addtogroup game
  * \param game the game state
@@ -55,6 +78,18 @@ bool GameParseArguments(
 	Game *game,
 	const char **argv,
 	const int argc);
+
+/*!
+ * Polls for network events.
+ * \addtogroup game
+ * \param game the game state
+ * \param timeout the interval for which this function should
+ *     block waiting for the control socket or one of its descriptors
+ *     to become ready
+ */
+void GamePoll(
+	Game *game,
+	Time *timeout);
 
 /*!
  * Runs the game until it finishes.

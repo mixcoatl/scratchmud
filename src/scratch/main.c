@@ -12,6 +12,7 @@
 #include <scratch/log.h>
 #include <scratch/random.h>
 #include <scratch/scratch.h>
+#include <scratch/socket.h>
 
 /* Local functions. */
 int main(int argc, const char *argv[]);
@@ -28,6 +29,10 @@ int main(int argc, const char *argv[]) {
   Log(L_MAIN, "Seeding shared RNG state.");
   RandomReseedTime(&g_random, NULL);
 
+  /* OS socket library */
+  Log(L_MAIN, "Starting OS socket library.");
+  SocketStartup();
+
   /* Run game */
   Log(L_MAIN, "Starting game.");
   Game *game = GameAlloc();
@@ -35,6 +40,10 @@ int main(int argc, const char *argv[]) {
     GameRun(game);
   }
   GameFree(game);
+
+  /* OS socket library again */
+  Log(L_MAIN, "Terminating OS socket library.");
+  SocketCleanup();
 
   /* Exit */
   Log(L_MAIN, "Exiting.");

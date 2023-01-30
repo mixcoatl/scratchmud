@@ -21,6 +21,7 @@
 #define L_ASSERT	"Assert"	/*!< Code assertion. */
 #define L_DATA		"Data"		/*!< Data-related messages. */
 #define L_MAIN		"Main"		/*!< Program entry point. */
+#define L_NETWORK	"Network"	/*!< Network server messages */
 #define L_SYSTEM	"System"	/*!< System errors, status, etc. */
 /*! \} */
 

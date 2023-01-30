@@ -140,6 +140,16 @@ static size_t strlcpy(char *dst, const char *src, size_t dstsize) {
 }
 #endif /* HAVE_STRLCPY */
 
+#ifndef _WIN32
+typedef struct sockaddr SOCKADDR;
+typedef struct sockaddr_in SOCKADDR_IN;
+typedef int SOCKET;
+#endif /* _WIN32 */
+
+#ifndef _WIN32
+#define INVALID_SOCKET (-1)
+#endif /* _WIN32 */
+
 /*!
  * Static input buffer size.
  * \addtogroup main
